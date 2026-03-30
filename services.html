@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — Isovex.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#030712;--surface:#0d1117;--surface2:#161b22;--accent:#00d4ff;--accent2:#7c3aed;--accent3:#06ffa5;--text:#f0f6fc;--muted:#8b949e;--border:#21262d;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.3;}
+nav{position:fixed;top:0;width:100%;z-index:100;padding:1.2rem 4rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(3,7,18,0.7);border-bottom:1px solid rgba(255,255,255,0.05);}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-cta{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:0.5rem 1.4rem;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;}
+
+.page-hero{position:relative;z-index:1;padding:10rem 4rem 4rem;text-align:center;}
+.page-hero .tag{display:inline-block;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:999px;padding:0.4rem 1rem;font-size:0.8rem;color:var(--accent);margin-bottom:1.5rem;}
+.page-hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:1rem;}
+.page-hero p{color:var(--muted);font-size:1rem;max-width:520px;margin:0 auto;line-height:1.7;}
+
+.services-detail{position:relative;z-index:1;padding:4rem;}
+.service-detail-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3rem;margin-bottom:2rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;transition:border-color 0.3s;}
+.service-detail-card:hover{border-color:var(--accent);}
+.service-detail-card.reverse{direction:rtl;}
+.service-detail-card.reverse>*{direction:ltr;}
+.sdc-left .icon-big{font-size:3rem;margin-bottom:1rem;display:block;}
+.sdc-left h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:1rem;}
+.sdc-left p{color:var(--muted);line-height:1.7;margin-bottom:1.5rem;font-size:0.95rem;}
+.feature-list{list-style:none;display:flex;flex-direction:column;gap:0.6rem;}
+.feature-list li{display:flex;align-items:center;gap:10px;font-size:0.88rem;color:var(--muted);}
+.feature-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.pricing-box{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:center;}
+.pricing-box .price-label{font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;}
+.pricing-box .price{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pricing-box .price-local{font-size:0.9rem;color:var(--muted);margin-top:0.3rem;}
+.pricing-box .delivery{margin-top:1rem;font-size:0.82rem;color:var(--muted);background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.1);border-radius:8px;padding:0.5rem;}
+.cta-strip{background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(124,58,237,0.1));border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:2rem;text-align:center;margin-top:1.5rem;}
+.cta-strip h3{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:0.5rem;}
+.cta-strip p{color:var(--muted);font-size:0.88rem;margin-bottom:1rem;}
+.btn-cta{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:0.7rem 1.8rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.9rem;}
+
+footer{position:relative;z-index:1;background:var(--surface);border-top:1px solid var(--border);padding:2.5rem 4rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;}
+.footer-copy{color:var(--muted);font-size:0.8rem;}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  .nav-links{display:none;}
+  .page-hero,.services-detail{padding:8rem 1.5rem 2rem;}
+  .service-detail-card{grid-template-columns:1fr;}
+  .service-detail-card.reverse{direction:ltr;}
+  footer{flex-direction:column;padding:2rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">IX</div>Isovex<span style="color:var(--accent)">.ai</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="services.html" class="active">Services</a></li>
+    <li><a href="capabilities.html">Capabilities</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+  <a href="index.html#contact" class="nav-cta">Get Started</a>
+</nav>
+
+<div class="page-hero">
+  <span class="tag">Our Services</span>
+  <h1>AI Solutions Built<br>for Real Business Problems</h1>
+  <p>Every service is delivered with precision, speed and a focus on measurable outcomes for your business.</p>
+</div>
+
+<div class="services-detail">
+
+  <div class="service-detail-card reveal" id="chatbot">
+    <div class="sdc-left">
+      <span class="icon-big">🤖</span>
+      <h2>Custom LLM Chatbots</h2>
+      <p>A chatbot that actually knows your business — trained on your documents, FAQs, product catalog and policies. Deployed on your website or WhatsApp and ready to handle customer queries 24/7 without human intervention.</p>
+      <ul class="feature-list">
+        <li>Trained on your own business data</li>
+        <li>Website and WhatsApp deployment</li>
+        <li>Supports GPT-4, Claude, Mistral and Llama</li>
+        <li>Handles hundreds of simultaneous conversations</li>
+        <li>Full handoff to human agent when needed</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pricing-box">
+        <div class="price-label">International Pricing</div>
+        <div class="price">$300 – $800</div>
+        <div class="price-local">PKR 80,000 – 200,000 locally</div>
+        <div class="delivery">Delivery in 5–7 days</div>
+      </div>
+      <div class="cta-strip">
+        <h3>Need a chatbot?</h3>
+        <p>Tell us what your business does and we will build a demo in 48 hours.</p>
+        <a href="https://wa.me/923248433258" class="btn-cta">WhatsApp Us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="service-detail-card reverse reveal" id="rag">
+    <div class="sdc-left">
+      <span class="icon-big">🔍</span>
+      <h2>RAG Pipelines</h2>
+      <p>Your company has hundreds of documents, PDFs, reports and manuals that nobody can search through quickly. A RAG pipeline connects all of it to an LLM — your team asks questions in plain English and gets precise answers with source references instantly.</p>
+      <ul class="feature-list">
+        <li>PDF, Word, Excel and database ingestion</li>
+        <li>Semantic search with ChromaDB or FAISS</li>
+        <li>Built with LangChain and LlamaIndex</li>
+        <li>Source citation with every answer</li>
+        <li>Deployed as web app or internal tool</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pricing-box">
+        <div class="price-label">International Pricing</div>
+        <div class="price">$500 – $1,500</div>
+        <div class="price-local">PKR 120,000 – 350,000 locally</div>
+        <div class="delivery">Delivery in 7–10 days</div>
+      </div>
+      <div class="cta-strip">
+        <h3>Have lots of documents?</h3>
+        <p>We can make them all searchable and queryable with AI.</p>
+        <a href="mailto:dev.taimoor148@gmail.com" class="btn-cta">Email Us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="service-detail-card reveal" id="agents">
+    <div class="sdc-left">
+      <span class="icon-big">⚡</span>
+      <h2>AI Agents</h2>
+      <p>Beyond answering questions — AI agents that actually do things. Book appointments, send follow-up emails, update your CRM, process orders and handle complaints — all without a human touching it.</p>
+      <ul class="feature-list">
+        <li>End-to-end task automation</li>
+        <li>CRM and calendar integration</li>
+        <li>Email and WhatsApp automation</li>
+        <li>Built with LangChain and n8n</li>
+        <li>Saves 15–30 hours of manual work per week</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pricing-box">
+        <div class="price-label">International Pricing</div>
+        <div class="price">$800 – $2,500</div>
+        <div class="price-local">PKR 200,000 – 600,000 locally</div>
+        <div class="delivery">Delivery in 10–14 days</div>
+      </div>
+      <div class="cta-strip">
+        <h3>Want to automate repetitive work?</h3>
+        <p>Tell us what your team does manually every day.</p>
+        <a href="https://wa.me/923248433258" class="btn-cta">WhatsApp Us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="service-detail-card reverse reveal" id="finetune">
+    <div class="sdc-left">
+      <span class="icon-big">🧠</span>
+      <h2>Model Fine-Tuning</h2>
+      <p>Generic AI models give generic answers. A fine-tuned model trained on your industry data speaks your language, understands your terminology and performs with expert-level accuracy specific to your domain.</p>
+      <ul class="feature-list">
+        <li>Llama, Mistral and open-source model fine-tuning</li>
+        <li>Domain-specific training datasets</li>
+        <li>Evaluation and benchmarking included</li>
+        <li>ONNX export for edge deployment</li>
+        <li>Full model ownership — no ongoing API costs</li>
+      </ul>
+    </div>
+    <div>
+      <div class="pricing-box">
+        <div class="price-label">International Pricing</div>
+        <div class="price">$1,000 – $3,000</div>
+        <div class="price-local">PKR 250,000 – 700,000 locally</div>
+        <div class="delivery">Delivery in 14–21 days</div>
+      </div>
+      <div class="cta-strip">
+        <h3>Need industry-specific AI?</h3>
+        <p>We fine-tune models that understand your exact domain.</p>
+        <a href="mailto:dev.taimoor148@gmail.com" class="btn-cta">Email Us</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Isovex<span style="color:var(--accent)">.ai</span></div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="capabilities.html">Capabilities</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 Isovex.ai</div>
+</footer>
+
+<script>
+const canvas=document.getElementById('bg-canvas');const ctx=canvas.getContext('2d');let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}resize();window.addEventListener('resize',resize);
+class Particle{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-0.5)*0.3;this.vy=(Math.random()-0.5)*0.3;this.r=Math.random()*1.5+0.5;this.color=Math.random()>0.5?'rgba(0,212,255,':'rgba(124,58,237,';this.alpha=Math.random()*0.5+0.2;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.color+this.alpha+')';ctx.fill();}}
+for(let i=0;i<80;i++)particles.push(new Particle());
+function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}animate();
+const reveals=document.querySelectorAll('.reveal');const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});reveals.forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capabilities — Isovex.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#030712;--surface:#0d1117;--surface2:#161b22;
+  --accent:#00d4ff;--accent2:#7c3aed;--accent3:#06ffa5;--accent4:#f59e0b;
+  --text:#f0f6fc;--muted:#8b949e;--border:#21262d;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.25;}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:100;padding:1.2rem 4rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(3,7,18,0.8);border-bottom:1px solid rgba(255,255,255,0.05);}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-cta{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:0.5rem 1.4rem;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;}
+
+/* HERO */
+.page-hero{position:relative;z-index:1;padding:10rem 4rem 5rem;text-align:center;}
+.page-hero .tag{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:999px;padding:0.4rem 1.2rem;font-size:0.8rem;color:var(--accent2);margin-bottom:1.5rem;}
+.page-hero .tag span{width:5px;height:5px;background:var(--accent2);border-radius:50%;animation:pulse 2s infinite;}
+.page-hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:1rem;line-height:1.1;}
+.page-hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-hero p{color:var(--muted);font-size:1rem;max-width:500px;margin:0 auto;line-height:1.75;}
+
+/* FILTER TABS */
+.filter-bar{position:relative;z-index:1;display:flex;justify-content:center;gap:0.6rem;padding:0 4rem 3rem;flex-wrap:wrap;}
+.filter-tab{padding:0.5rem 1.2rem;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;}
+.filter-tab:hover{border-color:var(--accent);color:var(--text);}
+.filter-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+
+/* MAIN STACK SECTION */
+.stack-section{position:relative;z-index:1;padding:0 4rem 6rem;}
+
+/* CATEGORY BLOCK */
+.cat-block{margin-bottom:4rem;opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.cat-block.visible{opacity:1;transform:translateY(0);}
+.cat-block[data-cat="all"]{display:block;}
+
+.cat-title-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;}
+.cat-pill{display:inline-flex;align-items:center;gap:10px;padding:0.6rem 1.2rem;border-radius:12px;border:1px solid;}
+.cat-pill .pill-icon{font-size:1.2rem;}
+.cat-pill .pill-text{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;}
+.cat-pill .pill-count{font-size:0.75rem;opacity:0.7;font-weight:400;}
+.cat-line{flex:1;height:1px;background:var(--border);}
+
+/* TECH CARDS - NEW DESIGN */
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.tech-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:1.4rem;
+  cursor:default;
+  transition:all 0.3s;
+  position:relative;
+  overflow:hidden;
+}
+.tech-card::after{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:var(--card-accent,var(--accent));
+  transform:scaleX(0);
+  transition:transform 0.3s;
+  transform-origin:left;
+}
+.tech-card:hover{transform:translateY(-4px);border-color:var(--card-accent,var(--accent));box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+.tech-card:hover::after{transform:scaleX(1);}
+
+.tc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.8rem;}
+.tc-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(255,255,255,0.04);flex-shrink:0;}
+.tc-badge{font-size:0.65rem;font-weight:600;padding:3px 8px;border-radius:999px;letter-spacing:0.04em;}
+.badge-expert{background:rgba(6,255,165,0.12);color:var(--accent3);border:1px solid rgba(6,255,165,0.2);}
+.badge-advanced{background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2);}
+.badge-proficient{background:rgba(124,58,237,0.1);color:var(--accent2);border:1px solid rgba(124,58,237,0.2);}
+
+.tc-name{font-family:'Syne',sans-serif;font-size:0.92rem;font-weight:700;margin-bottom:0.35rem;line-height:1.3;}
+.tc-desc{font-size:0.78rem;color:var(--muted);line-height:1.55;margin-bottom:1rem;}
+
+/* SKILL BAR */
+.skill-bar-wrap{position:relative;}
+.skill-bar-track{height:3px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;}
+.skill-bar-fill{height:100%;border-radius:999px;background:var(--card-accent,var(--accent));width:0%;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);}
+.skill-bar-pct{font-size:0.68rem;color:var(--muted);margin-top:4px;text-align:right;}
+
+/* HIGHLIGHT CARD */
+.tech-card.highlight{background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(124,58,237,0.06));border-color:rgba(0,212,255,0.2);}
+
+/* STACK SUMMARY */
+.stack-summary{position:relative;z-index:1;padding:0 4rem 6rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.8rem;text-align:center;transition:all 0.3s;}
+.summary-card:hover{transform:translateY(-3px);border-color:var(--accent);}
+.summary-num{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.summary-label{font-size:0.82rem;color:var(--muted);margin-top:6px;}
+
+/* PROJECTS */
+.projects-section{position:relative;z-index:1;padding:5rem 4rem;background:linear-gradient(180deg,var(--surface) 0%,var(--bg) 100%);}
+.sec-tag{font-size:0.75rem;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;}
+.sec-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.5rem;}
+.sec-sub{color:var(--muted);font-size:0.9rem;margin-bottom:3rem;}
+
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;}
+.project-card{background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:1.8rem;transition:all 0.3s;position:relative;overflow:hidden;}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--proj-color,var(--accent));transform:scaleX(0);transition:transform 0.3s;transform-origin:left;}
+.project-card:hover{border-color:var(--proj-color,var(--accent));transform:translateY(-4px);box-shadow:0 16px 50px rgba(0,0,0,0.5);}
+.project-card:hover::before{transform:scaleX(1);}
+.proj-cat{font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.8rem;color:var(--proj-color,var(--accent));}
+.project-card h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:0.6rem;}
+.project-card p{font-size:0.83rem;color:var(--muted);line-height:1.65;margin-bottom:1.2rem;}
+.proj-metrics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+.proj-metric{font-size:0.72rem;padding:3px 10px;border-radius:6px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);}
+.proj-metric.highlight{background:rgba(6,255,165,0.08);border-color:rgba(6,255,165,0.15);color:var(--accent3);}
+.proj-links{display:flex;gap:1rem;flex-wrap:wrap;}
+.proj-link{font-size:0.8rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);transition:all 0.2s;}
+.proj-link:hover{border-color:var(--accent);color:var(--accent);}
+
+/* FOOTER */
+footer{position:relative;z-index:1;background:var(--surface);border-top:1px solid var(--border);padding:2.5rem 4rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color 0.2s;}
+.footer-links a:hover{color:var(--text);}
+.footer-copy{color:var(--muted);font-size:0.8rem;}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem;}
+  .nav-links{display:none;}
+  .page-hero,.stack-section,.projects-section{padding-left:1.5rem;padding-right:1.5rem;}
+  .filter-bar,.stack-summary{padding-left:1.5rem;padding-right:1.5rem;}
+  footer{flex-direction:column;padding:2rem 1.5rem;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">IX</div>Isovex<span style="color:var(--accent)">.ai</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="capabilities.html" class="active">Capabilities</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+  <a href="index.html#contact" class="nav-cta">Get Started</a>
+</nav>
+
+<div class="page-hero">
+  <div class="tag"><span></span> Technology Stack</div>
+  <h1>Built With the<br><em>Best AI Tools</em> Available</h1>
+  <p>Every technology we use is chosen for performance, reliability and real-world production results — not hype.</p>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-tab active" onclick="filterCats('all',this)">All Technologies</button>
+  <button class="filter-tab" onclick="filterCats('llm',this)">LLM</button>
+  <button class="filter-tab" onclick="filterCats('rag',this)">RAG</button>
+  <button class="filter-tab" onclick="filterCats('ml',this)">Machine Learning</button>
+  <button class="filter-tab" onclick="filterCats('cv',this)">Computer Vision</button>
+  <button class="filter-tab" onclick="filterCats('nlp',this)">NLP</button>
+  <button class="filter-tab" onclick="filterCats('deploy',this)">Deployment</button>
+</div>
+
+<div class="stack-section">
+
+  <!-- LLM -->
+  <div class="cat-block" data-cat="llm">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(0,212,255,0.07);border-color:rgba(0,212,255,0.2);color:var(--accent);">
+        <span class="pill-icon">🧠</span>
+        <span class="pill-text">Large Language Models</span>
+        <span class="pill-count">6 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card highlight" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">⚡</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">GPT-4 / OpenAI API</div>
+        <div class="tc-desc">Production LLM apps with function calling, streaming and fine-tuning pipelines</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="95"></div></div><div class="skill-bar-pct">95%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🔗</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">LangChain</div>
+        <div class="tc-desc">Chains, agents, memory and tool integrations for complex LLM workflows</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="93"></div></div><div class="skill-bar-pct">93%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🦙</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">LlamaIndex</div>
+        <div class="tc-desc">Data ingestion, indexing strategies and RAG pipeline construction at scale</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="90"></div></div><div class="skill-bar-pct">90%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">🤗</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Hugging Face</div>
+        <div class="tc-desc">Model hub, transformers library, embeddings and hosted inference endpoints</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="92"></div></div><div class="skill-bar-pct">92%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:#f59e0b;">
+        <div class="tc-top"><div class="tc-logo">⚡</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">Groq API</div>
+        <div class="tc-desc">Ultra-fast Llama inference — ideal for real-time streaming chatbot applications</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="85"></div></div><div class="skill-bar-pct">85%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">🦙</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">Llama / Mistral</div>
+        <div class="tc-desc">Open-source LLMs for fine-tuning, private deployment and zero API cost solutions</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="82"></div></div><div class="skill-bar-pct">82%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAG -->
+  <div class="cat-block" data-cat="rag">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(124,58,237,0.07);border-color:rgba(124,58,237,0.2);color:var(--accent2);">
+        <span class="pill-icon">🔍</span>
+        <span class="pill-text">RAG and Vector Systems</span>
+        <span class="pill-count">4 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card highlight" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">🗃️</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">ChromaDB</div>
+        <div class="tc-desc">Vector database powering semantic search and intelligent document retrieval pipelines</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="94"></div></div><div class="skill-bar-pct">94%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">🔎</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">FAISS</div>
+        <div class="tc-desc">Facebook's high-performance similarity search for large-scale document collections</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><div class="skill-bar-pct">80%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">📄</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Document Ingestion</div>
+        <div class="tc-desc">PyPDF, Unstructured, Docx — multi-format processing pipelines for any data source</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="92"></div></div><div class="skill-bar-pct">92%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">🌐</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">Embeddings</div>
+        <div class="tc-desc">OpenAI, Cohere and sentence-transformer embeddings for semantic similarity search</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="88"></div></div><div class="skill-bar-pct">88%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ML -->
+  <div class="cat-block" data-cat="ml">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(6,255,165,0.07);border-color:rgba(6,255,165,0.2);color:var(--accent3);">
+        <span class="pill-icon">📊</span>
+        <span class="pill-text">Machine Learning</span>
+        <span class="pill-count">6 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">🌲</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Scikit-learn</div>
+        <div class="tc-desc">Classification, regression, clustering and full model evaluation pipelines</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="96"></div></div><div class="skill-bar-pct">96%</div></div>
+      </div>
+      <div class="tech-card highlight" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">🚀</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">XGBoost</div>
+        <div class="tc-desc">Gradient boosting powerhouse — R² 0.91+ achieved on production prediction models</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="93"></div></div><div class="skill-bar-pct">93%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:#f59e0b;">
+        <div class="tc-top"><div class="tc-logo">📈</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">MLflow</div>
+        <div class="tc-desc">Experiment tracking, model registry, versioning and deployment lifecycle management</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="85"></div></div><div class="skill-bar-pct">85%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">🐼</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Pandas / NumPy</div>
+        <div class="tc-desc">Data wrangling, feature engineering and statistical analysis at any scale</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="97"></div></div><div class="skill-bar-pct">97%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🔥</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">PyTorch</div>
+        <div class="tc-desc">Deep neural networks, custom training loops and model fine-tuning workflows</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="87"></div></div><div class="skill-bar-pct">87%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🧮</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">TensorFlow</div>
+        <div class="tc-desc">Production-grade deep learning pipelines and model export for deployment</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="82"></div></div><div class="skill-bar-pct">82%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPUTER VISION -->
+  <div class="cat-block" data-cat="cv">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.2);color:#f59e0b;">
+        <span class="pill-icon">👁️</span>
+        <span class="pill-text">Computer Vision</span>
+        <span class="pill-count">4 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card highlight" style="--card-accent:#f59e0b;">
+        <div class="tc-top"><div class="tc-logo">🔥</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">PyTorch CNNs</div>
+        <div class="tc-desc">Custom convolutional networks — 90.7% accuracy on 20K image facial demographics model</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="91"></div></div><div class="skill-bar-pct">91%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:#f59e0b;">
+        <div class="tc-top"><div class="tc-logo">👁️</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">OpenCV</div>
+        <div class="tc-desc">Real-time image processing, face detection, video analysis and feature extraction</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="93"></div></div><div class="skill-bar-pct">93%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🧮</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">TensorFlow Vision</div>
+        <div class="tc-desc">Transfer learning with ResNet, VGG and EfficientNet for production image models</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="82"></div></div><div class="skill-bar-pct">82%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">📦</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">ONNX</div>
+        <div class="tc-desc">Model optimization and export for edge deployment and cross-platform inference</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="78"></div></div><div class="skill-bar-pct">78%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NLP -->
+  <div class="cat-block" data-cat="nlp">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(0,212,255,0.07);border-color:rgba(0,212,255,0.2);color:var(--accent);">
+        <span class="pill-icon">💬</span>
+        <span class="pill-text">Natural Language Processing</span>
+        <span class="pill-count">4 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card highlight" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🤖</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">BERT Transformers</div>
+        <div class="tc-desc">Fine-tuned BERT for text classification — 93%+ accuracy on AI vs Human detection task</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="93"></div></div><div class="skill-bar-pct">93%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">📰</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Text Classification</div>
+        <div class="tc-desc">Multi-category news and content classification with 95% accuracy on production systems</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="95"></div></div><div class="skill-bar-pct">95%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">💡</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Sentiment Analysis</div>
+        <div class="tc-desc">Customer feedback, social media and product review sentiment pipelines</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="90"></div></div><div class="skill-bar-pct">90%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">🔤</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">Sentence Transformers</div>
+        <div class="tc-desc">Semantic similarity, clustering and dense retrieval for search and RAG systems</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="87"></div></div><div class="skill-bar-pct">87%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEPLOYMENT -->
+  <div class="cat-block" data-cat="deploy">
+    <div class="cat-title-row">
+      <div class="cat-pill" style="background:rgba(124,58,237,0.07);border-color:rgba(124,58,237,0.2);color:var(--accent2);">
+        <span class="pill-icon">🚀</span>
+        <span class="pill-text">Deployment and Automation</span>
+        <span class="pill-count">6 tools</span>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card highlight" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">⚡</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">FastAPI</div>
+        <div class="tc-desc">High-performance async REST APIs for ML model serving and AI microservices</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="94"></div></div><div class="skill-bar-pct">94%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent2);">
+        <div class="tc-top"><div class="tc-logo">🌶️</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Flask</div>
+        <div class="tc-desc">Lightweight web applications and API endpoints — multiple live production deployments</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="96"></div></div><div class="skill-bar-pct">96%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🐳</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">Docker</div>
+        <div class="tc-desc">Containerized deployments ensuring consistent, reproducible AI service environments</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="83"></div></div><div class="skill-bar-pct">83%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent3);">
+        <div class="tc-top"><div class="tc-logo">⚙️</div><span class="tc-badge badge-advanced">Advanced</span></div>
+        <div class="tc-name">n8n Automation</div>
+        <div class="tc-desc">Visual AI workflow automation — connecting APIs, models and business tools seamlessly</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><div class="skill-bar-pct">80%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:#f59e0b;">
+        <div class="tc-top"><div class="tc-logo">☁️</div><span class="tc-badge badge-proficient">Proficient</span></div>
+        <div class="tc-name">AWS</div>
+        <div class="tc-desc">Cloud infrastructure, S3 storage, Lambda functions and scalable AI service hosting</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="72"></div></div><div class="skill-bar-pct">72%</div></div>
+      </div>
+      <div class="tech-card" style="--card-accent:var(--accent);">
+        <div class="tc-top"><div class="tc-logo">🚂</div><span class="tc-badge badge-expert">Expert</span></div>
+        <div class="tc-name">Railway / Render</div>
+        <div class="tc-desc">Fast, reliable cloud deployment of FastAPI and Flask apps with zero DevOps friction</div>
+        <div class="skill-bar-wrap"><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="95"></div></div><div class="skill-bar-pct">95%</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUMMARY NUMBERS -->
+<div class="stack-summary">
+  <div class="summary-card"><div class="summary-num">30+</div><div class="summary-label">Technologies Mastered</div></div>
+  <div class="summary-card"><div class="summary-num">6</div><div class="summary-label">Live Deployed Projects</div></div>
+  <div class="summary-card"><div class="summary-num">95%</div><div class="summary-label">Peak Model Accuracy</div></div>
+  <div class="summary-card"><div class="summary-num">R²0.91</div><div class="summary-label">Best Regression Score</div></div>
+</div>
+
+<!-- PROJECTS -->
+<div class="projects-section">
+  <div class="sec-tag">Proof of Work</div>
+  <h2 class="sec-title">Live Projects</h2>
+  <p class="sec-sub">Real deployed systems — not just notebooks and demos.</p>
+  <div class="projects-grid">
+    <div class="project-card" style="--proj-color:var(--accent);">
+      <div class="proj-cat">Computer Vision</div>
+      <h3>Facial Demographics AI</h3>
+      <p>CNN built with PyTorch and OpenCV, trained on 20,000 images for real-time age, gender and ethnicity detection.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">90.7% Accuracy</span><span class="proj-metric">20K Images</span><span class="proj-metric">PyTorch + OpenCV</span></div>
+      <div class="proj-links">
+        <a href="https://huggingface.co/spaces/taimoor951/facial-demographics-ai" target="_blank" class="proj-link">Hugging Face →</a>
+        <a href="https://devtaimoor.pythonanywhere.com/" target="_blank" class="proj-link">Live App →</a>
+      </div>
+    </div>
+    <div class="project-card" style="--proj-color:var(--accent2);">
+      <div class="proj-cat">NLP</div>
+      <h3>NLP News Classifier</h3>
+      <p>FastAPI-powered news classification across 5 categories with RAG-ready embeddings for downstream retrieval tasks.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">95% Accuracy</span><span class="proj-metric">5 Categories</span><span class="proj-metric">FastAPI</span></div>
+      <div class="proj-links">
+        <a href="https://devtaimoor.pythonanywhere.com/" target="_blank" class="proj-link">Live App →</a>
+      </div>
+    </div>
+    <div class="project-card" style="--proj-color:var(--accent3);">
+      <div class="proj-cat">Machine Learning</div>
+      <h3>Student Performance Predictor</h3>
+      <p>XGBoost regression model with MLflow experiment tracking that predicts academic outcomes from behavioral features.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">R² 0.904</span><span class="proj-metric">XGBoost</span><span class="proj-metric">MLflow</span></div>
+      <div class="proj-links">
+        <a href="https://github.com/MuhammadTaimoorHaider/Student-Perfomance-Predictor" target="_blank" class="proj-link">GitHub →</a>
+      </div>
+    </div>
+    <div class="project-card" style="--proj-color:var(--accent);">
+      <div class="proj-cat">NLP / Transformers</div>
+      <h3>AI vs Human Text Detector</h3>
+      <p>Fine-tuned BERT transformer classifying whether text was written by a human or generated by AI with high precision.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">93%+ Accuracy</span><span class="proj-metric">BERT</span><span class="proj-metric">FastAPI</span></div>
+      <div class="proj-links">
+        <a href="https://github.com/MuhammadTaimoorHaider/AIvsHumanTextDetector" target="_blank" class="proj-link">GitHub →</a>
+      </div>
+    </div>
+    <div class="project-card" style="--proj-color:#f59e0b;">
+      <div class="proj-cat">Computer Vision / Security</div>
+      <h3>FeminaFortress</h3>
+      <p>AI-powered women's hostel security system with CNN facial recognition, anomaly detection and integrated payment gateway. Sold to Subhan Hostel.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">Sold to Client</span><span class="proj-metric">Live System</span><span class="proj-metric">CNN + Payments</span></div>
+    </div>
+    <div class="project-card" style="--proj-color:var(--accent3);">
+      <div class="proj-cat">Machine Learning</div>
+      <h3>Car Price Prediction</h3>
+      <p>Ensemble model combining Random Forest and XGBoost with full MLflow tracking, deployed as a Flask web application.</p>
+      <div class="proj-metrics"><span class="proj-metric highlight">R² 0.91</span><span class="proj-metric">Random Forest</span><span class="proj-metric">Flask</span></div>
+      <div class="proj-links">
+        <a href="https://github.com/MuhammadTaimoorHaider/CarPricePrediction" target="_blank" class="proj-link">GitHub →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Isovex<span style="color:var(--accent)">.ai</span></div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="capabilities.html">Capabilities</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2025 Isovex.ai — All rights reserved</div>
+</footer>
+
+<script>
+// BG CANVAS
+const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+class P{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.25;this.vy=(Math.random()-.5)*.25;this.r=Math.random()*1.2+.4;this.c=Math.random()>.5?'rgba(0,212,255,':'rgba(124,58,237,';this.a=Math.random()*.5+.15;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.c+this.a+')';ctx.fill();}}
+for(let i=0;i<100;i++)pts.push(new P());
+function draw(){ctx.clearRect(0,0,W,H);for(let i=0;i<pts.length;i++){pts[i].update();pts[i].draw();for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,212,255,${.06*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke();}}}requestAnimationFrame(draw);}draw();
+
+// FILTER
+function filterCats(cat,btn){
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.cat-block').forEach(b=>{
+    if(cat==='all'||b.dataset.cat===cat){b.style.display='block';}
+    else{b.style.display='none';}
+  });
+}
+
+// SCROLL REVEAL + SKILL BARS
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.skill-bar-fill').forEach(bar=>{
+        setTimeout(()=>{bar.style.width=bar.dataset.pct+'%';},200);
+      });
+    }
+  });
+},{threshold:0.08});
+document.querySelectorAll('.cat-block').forEach(b=>observer.observe(b));
+</script>
+</body>
+</html>
